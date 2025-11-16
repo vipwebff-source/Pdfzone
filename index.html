@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pdf.Zone by Anshu</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <!-- RemixIcon -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-light: #FFFFFF;
+            --secondary-light: #111111; /* Matt Black */
+            --accent-light: #111111;
+            --subtext-light: #444444;
+            --primary-dark: #0D0D0D;
+            --secondary-dark: #FFFFFF;
+            --accent-dark: #22E3F3;
+            --subtext-dark: #A9A9A9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-light);
+            color: var(--secondary-light);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        body.dark {
+            background-color: var(--primary-dark);
+            color: var(--secondary-dark);
+        }
+
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0D0D0D;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            color: white;
+        }
+
+        .splash-screen.fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .bar-loader {
+            width: 300px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .bar-loader-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #111111;
+            border-radius: 2px;
+            animation: fillBar 2.5s ease-in-out forwards;
+        }
+
+        @keyframes fillBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Navigation */
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .dark .nav-blur {
+            background-color: rgba(13, 13, 13, 0.8);
+        }
+
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        /* Character Image Animation */
+        .profile-image {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Background Elements */
+        .bg-pattern {
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.03;
+            z-index: -1;
+            font-weight: 800;
+            color: #111111;
+        }
+
+        .dark .bg-pattern {
+            color: #fff;
+        }
+
+        .bg-cross {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            z-index: -1;
+            color: #111111;
+        }
+
+        .dark .bg-cross {
+            color: #22E3F3;
+        }
+
+        /* Modal */
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.open .modal-content {
+            transform: translateY(0);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .theme-slider {
+            background-color: #22E3F3;
+        }
+
+        input:checked + .theme-slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.8s ease forwards;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        @keyframes slideUp {
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Button Hover Effects */
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .btn-hover:hover {
+            box-shadow: 0 4px 8px rgba(34, 227, 243, 0.2);
+        }
+
+        .icon-hover {
+            transition: all 0.3s ease;
+        }
+
+        .icon-hover:hover {
+            transform: scale(1.1);
+        }
+
+        .cross-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Skill Bars */
+        .skill-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dark .skill-bar {
+            background-color: #374151;
+        }
+
+        .skill-level {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #111111;
+            transition: width 1s ease-in-out;
+        }
+
+        .dark .skill-level {
+            background-color: #22E3F3;
+        }
+
+        /* Project Cards */
+        .project-card {
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .project-card:hover {
+            box-shadow: 0 10px 25px rgba(34, 227, 243, 0.1);
+        }
+
+        /* Section Styles */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Member Cards */
+        .member-card {
+            transition: all 0.3s ease;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .member-card:hover {
+            box-shadow: 0 10px 25px rgba(34, 227, 243, 0.1);
+        }
+
+        /* Profile Pages */
+        .profile-banner {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Konoha Symbol */
+        .konoha-symbol {
+            font-size: 12rem;
+            opacity: 0.05;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="font-cursive text-6xl md:text-8xl mb-4">⚡ Pdf.Zone</div>
+        <div class="text-xl md:text-2xl font-poppins">by Anshu</div>
+        <div class="bar-loader">
+            <div class="bar-loader-fill"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 nav-blur">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Hamburger Menu (Mobile) -->
+            <button id="hamburgerBtn" class="md:hidden text-2xl">
+                <i class="ri-menu-line"></i>
+            </button>
+
+            <!-- Logo (Hidden on mobile) -->
+            <div class="hidden md:block font-poppins font-bold text-xl">⚡ Pdf.Zone</div>
+
+            <!-- Center Navigation (Desktop) -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#" data-section="home" class="nav-link hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Home</a>
+                <a href="#" data-section="downloads" class="nav-link hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Downloads</a>
+                <a href="#" data-section="notices" class="nav-link hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Notices</a>
+                <a href="#" data-section="settings" class="nav-link hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Settings</a>
+            </div>
+
+            <!-- Right Icons -->
+            <div class="flex items-center space-x-4">
+                <button id="themeToggleBtn" class="icon-hover">
+                    <i class="ri-contrast-2-line text-xl"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-gray-300 overflow-hidden">
+                    <img src="https://i.postimg.cc/90rFKKyQ/1000095331-removebg-preview.png" alt="PDF Zone" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed top-0 left-0 w-64 h-full bg-white dark:bg-gray-900 z-40 p-6 shadow-lg">
+        <button id="closeMenu" class="absolute top-4 right-4 text-2xl">
+            <i class="ri-close-line"></i>
+        </button>
+        <div class="font-poppins font-bold text-xl mb-8 mt-10">⚡ Pdf.Zone</div>
+        <div class="flex flex-col space-y-6">
+            <a href="#" data-section="home" class="text-lg hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Home</a>
+            <a href="#" data-section="downloads" class="text-lg hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Downloads</a>
+            <a href="#" data-section="notices" class="text-lg hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Notices</a>
+            <a href="#" data-section="settings" class="text-lg hover:text-black dark:hover:text-cyan-400 transition-all duration-300">Settings</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        <!-- Home Section -->
+        <section id="home" class="section active container mx-auto px-4 py-12">
+            <div class="flex flex-col lg:flex-row items-center">
+                <!-- Text Section -->
+                <div class="lg:w-1/2 mb-12 lg:mb-0 fade-in">
+                    <h1 class="font-poppins font-extrabold text-5xl md:text-6xl uppercase mb-2">⚡ Pdf.Zone</h1>
+                    <p class="text-gray-700 dark:text-gray-400 mb-6 text-lg">Official exam & registration form hub</p>
+                    
+                    <p class="mb-8 text-gray-700 dark:text-gray-300 leading-relaxed">
+                        Your one-stop destination for all exam forms and registration documents. 
+                        Download important forms, stay updated with notices, and never miss a deadline.
+                    </p>
+                    
+                    <button id="viewDownloadsBtn" class="bg-black dark:bg-cyan-400 text-white dark:text-black px-6 py-3 rounded-full mb-8 btn-hover font-medium">
+                        View Downloads
+                    </button>
+                    
+                    <!-- App Info -->
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div>
+                            <div class="font-bold">Developer</div>
+                            <div class="text-gray-700 dark:text-gray-400 text-sm">Anshu</div>
+                        </div>
+                        <div>
+                            <div class="font-bold">Status</div>
+                            <div class="text-gray-700 dark:text-gray-400 text-sm">Active</div>
+                        </div>
+                        <div>
+                            <div class="font-bold">Forms</div>
+                            <div class="text-gray-700 dark:text-gray-400 text-sm">Class 12 & 11</div>
+                        </div>
+                        <div>
+                            <div class="font-bold">Specialty</div>
+                            <div class="text-gray-700 dark:text-gray-400 text-sm">Easy Access</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Icons -->
+                    <div class="flex space-x-4">
+                        <a href="#" class="icon-hover">
+                            <i class="ri-file-pdf-fill text-2xl text-gray-700 dark:text-gray-400"></i>
+                        </a>
+                        <a href="#" class="icon-hover">
+                            <i class="ri-download-fill text-2xl text-gray-700 dark:text-gray-400"></i>
+                        </a>
+                        <a href="#" class="icon-hover">
+                            <i class="ri-notification-3-fill text-2xl text-gray-700 dark:text-gray-400"></i>
+                        </a>
+                        <a href="#" class="icon-hover">
+                            <i class="ri-bookmark-fill text-2xl text-gray-700 dark:text-gray-400"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Image Section -->
+                <div class="lg:w-1/2 relative flex justify-center lg:justify-end">
+                    <!-- Background Elements -->
+                    <div class="bg-pattern font-poppins top-10 right-10">PZ</div>
+                    <div class="bg-cross cross-pulse top-20 left-10">+</div>
+                    <div class="bg-cross cross-pulse bottom-20 right-20">+</div>
+                    <div class="bg-cross cross-pulse top-1/2 left-1/4">+</div>
+                    
+                    <!-- PDF Icon Image -->
+                    <div class="profile-image relative z-10">
+                        <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" 
+                             alt="PDF Zone" 
+                             class="w-full max-w-md lg:max-w-lg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Downloads Section -->
+        <section id="downloads" class="section container mx-auto px-4 py-12 slide-up">
+            <h2 class="font-poppins font-bold text-3xl mb-8 text-center">Download Forms</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Class 12 Card -->
+                <div class="project-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-4">
+                                <i class="ri-file-text-fill text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-poppins font-bold text-xl">Class 12 Exam Form</h3>
+                                <p class="text-gray-700 dark:text-gray-300">PDF Document</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-6">
+                            Download the official exam form for Class 12 students. Fill it out and keep it ready for submission.
+                        </p>
+                        <button id="downloadClass12Btn" class="w-full bg-black dark:bg-cyan-400 text-white dark:text-black py-3 rounded-lg btn-hover font-medium">
+                            Download Form
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Class 11 Card -->
+                <div class="project-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg opacity-60">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-4">
+                                <i class="ri-file-text-fill text-gray-500 dark:text-gray-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-poppins font-bold text-xl">Class 11 Registration Form</h3>
+                                <p class="text-gray-700 dark:text-gray-300">PDF Document</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-6">
+                            Registration form for Class 11 students. Currently unavailable.
+                        </p>
+                        <button id="downloadClass11Btn" class="w-full bg-gray-400 dark:bg-gray-600 text-white py-3 rounded-lg font-medium cursor-not-allowed" disabled>
+                            Offline
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notice Box -->
+            <div class="max-w-4xl mx-auto mt-12">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                    <h3 class="font-poppins font-bold text-xl mb-4 text-center">📢 Important Notices</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-4 mt-1">
+                                <i class="ri-check-line text-green-600 dark:text-green-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Class 12th exam form live to download</h4>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm">Start from 19 November kindly download it</p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-4"></div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-4 mt-1">
+                                <i class="ri-time-line text-gray-500 dark:text-gray-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Class 11th registration form currently offline</h4>
+                                <p class="text-gray-700 dark:text-gray-300 text-sm">"Abhi start nahi hua hai notice ka wait kare"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notices Section -->
+        <section id="notices" class="section container mx-auto px-4 py-12 slide-up">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="font-poppins font-bold text-3xl mb-8 text-center">Latest Notices</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg mb-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-4">
+                            <i class="ri-megaphone-fill text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-poppins font-bold text-xl">Class 12 Exam Forms Available</h3>
+                            <p class="text-gray-700 dark:text-gray-300 text-sm">Posted on November 15, 2025</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        The Class 12 Exam Form (PDF) is now available for download. The exam form fill-up process will begin from 19 November.
+                    </p>
+                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <i class="ri-download-fill mr-1"></i>
+                        <span>Download available until December 10, 2025</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg mb-6 opacity-70">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-4">
+                            <i class="ri-time-fill text-gray-500 dark:text-gray-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-poppins font-bold text-xl">Class 11 Registration Forms</h3>
+                            <p class="text-gray-700 dark:text-gray-300 text-sm">Coming soon</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                        The Class 11 registration forms will be available shortly. Please wait for the official announcement.
+                    </p>
+                    <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <i class="ri-information-line mr-1"></i>
+                        <span>Expected release: December 2025</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-4">
+                            <i class="ri-lightbulb-flash-fill text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-poppins font-bold text-xl">Important Instructions</h3>
+                            <p class="text-gray-700 dark:text-gray-300 text-sm">Guidelines for form submission</p>
+                        </div>
+                    </div>
+                    <ul class="text-gray-700 dark:text-gray-300 list-disc pl-5 space-y-2">
+                        <li>Download the form and fill it carefully</li>
+                        <li>Keep all necessary documents ready</li>
+                        <li>Submit before the deadline to avoid late fees</li>
+                        <li>Contact administration for any queries</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section container mx-auto px-4 py-12 slide-up">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="font-poppins font-bold text-3xl mb-8 text-center">Settings</h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+                    <!-- Theme Settings -->
+                    <div class="mb-8">
+                        <h3 class="font-poppins font-bold text-xl mb-4">Theme</h3>
+                        <div class="flex items-center justify-between">
+                            <span>Dark Mode</span>
+                            <label class="theme-toggle">
+                                <input type="checkbox" id="themeToggle">
+                                <span class="theme-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Volume Settings -->
+                    <div class="mb-8">
+                        <h3 class="font-poppins font-bold text-xl mb-4">Download Prompt Sound</h3>
+                        <div class="flex items-center space-x-4">
+                            <i class="ri-volume-down-line"></i>
+                            <input type="range" min="0" max="100" value="50" class="w-full accent-black dark:accent-cyan-400">
+                            <i class="ri-volume-up-line"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Preferences -->
+                    <div>
+                        <h3 class="font-poppins font-bold text-xl mb-4">Preferences</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="soundToggle" class="mr-3 w-5 h-5 accent-black dark:accent-cyan-400" checked>
+                                <label for="soundToggle">Enable Sound Effects</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="animationsToggle" class="mr-3 w-5 h-5 accent-black dark:accent-cyan-400" checked>
+                                <label for="animationsToggle">Animation Effects</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="notificationsToggle" class="mr-3 w-5 h-5 accent-black dark:accent-cyan-400">
+                                <label for="notificationsToggle">Notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-gray-700 dark:text-gray-400 text-sm">
+        <p>⚡ Pdf.Zone by Anshu</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const splashScreen = document.getElementById('splashScreen');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMenu = document.getElementById('closeMenu');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-link, #mobileMenu a');
+        const viewDownloadsBtn = document.getElementById('viewDownloadsBtn');
+        const downloadClass12Btn = document.getElementById('downloadClass12Btn');
+        const downloadClass11Btn = document.getElementById('downloadClass11Btn');
+
+        // Initialize theme from localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.checked = true;
+        }
+
+        // Splash Screen
+        setTimeout(() => {
+            splashScreen.classList.add('fade-out');
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 500);
+        }, 2500);
+
+        // Mobile Menu Toggle
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // Theme Toggle
+        themeToggleBtn.addEventListener('click', () => {
+            themeToggle.checked = !themeToggle.checked;
+            updateTheme();
+        });
+
+        themeToggle.addEventListener('change', updateTheme);
+
+        function updateTheme() {
+            if (themeToggle.checked) {
+                body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Section Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = link.getAttribute('data-section');
+                
+                // Hide all sections
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Close mobile menu if open
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // View Downloads Button
+        viewDownloadsBtn.addEventListener('click', () => {
+            // Hide all sections
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show downloads section
+            document.getElementById('downloads').classList.add('active');
+        });
+
+        // Download Class 12 Button
+        downloadClass12Btn.addEventListener('click', () => {
+            Swal.fire({
+                title: '📢 NOTICE – ONLY FOR CLASS 12th STUDENTS',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-4">Dear Students,</p>
+                        <p class="mb-4">The Class 12 Exam Form (PDF) is being shared in the group.</p>
+                        <p class="mb-4">The exam form fill-up process will begin from 19 November.</p>
+                        <p class="mb-4">Please download the form and keep it ready.</p>
+                        <p class="mt-6">– By Order</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Download Now',
+                confirmButtonColor: '#111111',
+                customClass: {
+                    popup: 'dark:bg-gray-800 dark:text-white',
+                    title: 'dark:text-white',
+                    htmlContainer: 'dark:text-gray-300'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create a temporary link to trigger download
+                    const link = document.createElement('a');
+                    link.href = 'class12.pdf';
+                    link.download = 'class12_exam_form.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            });
+        });
+
+        // Download Class 11 Button
+        downloadClass11Btn.addEventListener('click', () => {
+            Swal.fire({
+                title: 'Form Unavailable',
+                text: 'This form is currently offline. Notice ka wait kare.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#111111',
+                customClass: {
+                    popup: 'dark:bg-gray-800 dark:text-white'
+                }
+            });
+        });
+
+        // Settings toggles
+        const soundToggle = document.getElementById('soundToggle');
+        const animationsToggle = document.getElementById('animationsToggle');
+        const notificationsToggle = document.getElementById('notificationsToggle');
+
+        // Load saved settings
+        if (localStorage.getItem('sound') === 'false') soundToggle.checked = false;
+        if (localStorage.getItem('animations') === 'false') animationsToggle.checked = false;
+        if (localStorage.getItem('notifications') === 'true') notificationsToggle.checked = true;
+
+        // Save settings
+        soundToggle.addEventListener('change', function() {
+            localStorage.setItem('sound', this.checked);
+        });
+
+        animationsToggle.addEventListener('change', function() {
+            localStorage.setItem('animations', this.checked);
+        });
+
+        notificationsToggle.addEventListener('change', function() {
+            localStorage.setItem('notifications', this.checked);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
